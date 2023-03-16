@@ -5,11 +5,25 @@ using CommunityToolkit.Maui.Core.Views.CameraView;
 
 namespace CommunityToolkit.Maui.Core.Handlers;
 
-public partial class CameraViewHandler : ViewHandler<ICameraView, PreviewView>
+public partial class CameraViewHandler : ViewHandler<ICameraView, PreviewView>, IDisposable
 {
 	public static Action<byte[]>? Picture { get; set; }
 	
 	CameraManager? cameraManager;
+
+	public void Dispose()
+	{
+		Dispose(disposing: true);
+		GC.SuppressFinalize(this);
+	}
+
+	protected virtual void Dispose(bool disposing)
+	{
+		if (disposing)
+		{
+			cameraManager?.Dispose();
+		}
+	}
 
 	public static IPropertyMapper<ICameraView, CameraViewHandler> Propertymapper = new PropertyMapper<ICameraView, CameraViewHandler>(ViewMapper)
 	{

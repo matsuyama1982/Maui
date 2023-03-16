@@ -32,7 +32,7 @@ class Bla : CameraManager
 	}
 }
 
-public partial class CameraManager
+public partial class CameraManager : IDisposable
 {
 	PreviewView? previewView;
 	IExecutorService? cameraExecutor;
@@ -43,7 +43,21 @@ public partial class CameraManager
 	ICamera? camera;
 
 	internal Action? Loaded { get; set; }
-	
+
+	public void Dispose()
+	{
+		Dispose(disposing: true);
+		GC.SuppressFinalize(this);
+	}
+	protected virtual void Dispose(bool disposing)
+	{
+		if (disposing)
+		{
+			previewView?.Dispose();
+			imageCallback?.Dispose();
+		}
+	}
+
 	// IN the future change the return type to be an alias
 	public PreviewView CreatePlatformView()
 	{
@@ -78,6 +92,7 @@ public partial class CameraManager
 			.Build();
 
 			var owner = (ILifecycleOwner)Context;
+
 			camera = cameraProvider.BindToLifecycle(owner, CameraSelector.DefaultBackCamera, cameraPreview, imageCapture);
 
 			//start the camera with AutoFocus
